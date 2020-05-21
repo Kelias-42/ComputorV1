@@ -11,15 +11,15 @@ def split_coeffs(str):
             else:
                 coef = float(str[i])
         elif (str[i][0] == 'X'):
-            power = int(str[i][2])
+            power = int(str[i][2:])
+            if power > 2:
+                sys.exit('The polynomial degree is strictly greater than 2, I can\'t solve.')
         elif ((str[i][0] >= '0' and str[i][0] <= '9') or str[i][0] == '.'):
             coef = float(str[i])
         if (power != -1 and coef != -1):
             eq[power] = coef * sign
             sign, power, coef = [1, -1, -1]
     return eq
-                
-
 
 def parse():
     if (len(sys.argv) == 1):
@@ -29,7 +29,15 @@ def parse():
     req = split_coeffs(right)
     return leq, req
 
+def print_eq(eq):
+    if (eq == [0, 0, 0]):
+        sys.exit("The solution is all real numbers.")
+    for i in range(3):
+        if eq[i] == 0:
+            pass
 
 req, leq = parse()
+reduced_form = [req[0] - leq[0], req[1] - leq[1], req[2] - leq[2]]
+print_eq(reduced_form)
 print(req)
 print(leq)
