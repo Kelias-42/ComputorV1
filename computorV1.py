@@ -29,15 +29,22 @@ def parse():
     req = split_coeffs(right)
     return leq, req
 
-def print_eq(eq):
+def print_reduced_eq(eq):
     if (eq == [0, 0, 0]):
         sys.exit("The solution is all real numbers.")
+    print("Reduced form: ", end='')
     for i in range(3):
-        if eq[i] == 0:
+        coef = eq[i]
+        if coef == 0:
             pass
+        coef = coef if i == 0 else abs(coef)
+        coef = coef if coef - int(coef) > 0 else int(coef) 
+        print(coef, "*", "X^" + str(i), end='')
+        if (i == 0 or i == 1) and eq[i + 1] != 0:
+            print(" + " if eq[i + 1] > 0 else " - ", end='')
+    print(" = 0")
 
-req, leq = parse()
-reduced_form = [req[0] - leq[0], req[1] - leq[1], req[2] - leq[2]]
-print_eq(reduced_form)
-print(req)
-print(leq)
+if __name__ == "__main__":
+    req, leq = parse()
+    reduced_form = [req[0] - leq[0], req[1] - leq[1], req[2] - leq[2]]
+    print_reduced_eq(reduced_form)
