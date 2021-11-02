@@ -58,17 +58,33 @@ def print_reduced_eq(eq):
 				print(" + " if eq[i + 1] > 0 else " - ", end='')
 	print(" = 0")
 
-def solve(eq):
-	while len(eq) < 3:
-		eq.append(0)
-	a, b, c = eq[0], eq[1], eq[2]
-	delta = b**2 - 4*a*c
+def compute_delta(a, b, c):
+	return b**2 - 4 * a * c
+
+def get_coeffs(equation):
+	while len(equation) < 3:
+		equation.append(0)
+	return equation[0], equation[1], equation[2]
+
+def solve(a, b, delta):
 	if delta == 0:
-		return -b / 2*a
+		return -b / 2 * a
 	elif delta > 0:
-		return [(-b + math.sqrt(delta)) / 2*a, (-b - math.sqrt(delta)) / 2*a]
+		return [round((-b + math.sqrt(delta)) / 2 * a, 6), round((-b - math.sqrt(delta)) / 2 * a, 6)]
 	else:
-		return [f"{-b} + i * {math.sqrt(abs(delta))} / {2*a}", f"{-b} - i * {math.sqrt(abs(delta))} / {2*a}"]
+		return [f"{-b} + i * {round(math.sqrt(abs(delta)), 6)} / {2 * a}", f"{-b} - i * {round(math.sqrt(abs(delta)), 6)} / {2 * a}"]
+
+def pretty_print_solution(delta, sol):
+	if delta == 0:
+		print("Discrimant is null, ", end='')
+	elif delta > 0:
+		print("Discriminant is stricly positive, ", end='')
+	elif delta < 0:
+		print("Discriminant is stricly negative, ", end='')
+	print(f"solution{'s are' if len(sol) > 1 else ' is'}:")
+	for solution in sol:
+		print(solution)
+
 
 if __name__ == "__main__":
 	try:
@@ -83,8 +99,11 @@ if __name__ == "__main__":
 		if len(reduced_form) - 1 > 2:
 			print("The polynomial degree is strictly greater than 2, I can't solve.")
 		else:
-			sol = solve(reduced_form)
-		print(f"Solution{'s are' if len(sol) > 1 else ' is'}:\n{sol}")
-	except:
-		print("Please enter your coefficients in the format C * X^P")
-		print("Example of a correct input: '5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0'")
+			a, b, c = get_coeffs(reduced_form)
+			delta = compute_delta(a, b, c)
+			sol = solve(a, b, delta)
+		pretty_print_solution(delta, sol)
+	except Exception as ex:
+		print(ex)
+		print("Please enter your coefficients in the format : C * X^P")
+		print("Example of a correct input : '5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0'")
