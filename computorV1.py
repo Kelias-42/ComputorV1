@@ -1,5 +1,14 @@
-import sys, math
+import sys
 import numpy as np
+
+def absolute(number):
+	return number if number > 0 else -number
+
+def sqrt(number):
+        estimate = number / 2
+        while absolute(estimate * estimate - number) > 0.00001:
+                estimate = (estimate + number / estimate) / 2
+        return estimate
 
 def get_highest_power(str):
 	power = 0
@@ -30,7 +39,7 @@ def split_coefs(str, list_len ):
 
 def parse():
 	if (len(sys.argv) == 1):
-		sys.exit('Please provide valid equation to solve')
+		sys.exit('Please provide a valid equation to solve')
 	left, right = (sys.argv[1]).split(" = ")
 	max_pwr = max(get_highest_power(left), get_highest_power(right))
 	leq = split_coefs(left, max_pwr + 1)
@@ -45,13 +54,11 @@ def is_at_end(eq, i):
 	return True
 
 def print_reduced_eq(eq):
-	if eq == np.zeros(len(eq)).tolist():
-		sys.exit("The solution is all real numbers.")
 	print("Reduced form: ", end='')
 	for i in range(len(eq)):
 		coef = eq[i]
 		if coef != 0:
-			coef = coef if i == 0 else abs(coef)
+			coef = coef if i == 0 else absolute(coef)
 			coef = coef if coef - int(coef) > 0 else int(coef) 
 			print(coef, "*", "X^" + str(i), end='')
 			if i != len(eq) - 1:
@@ -59,7 +66,7 @@ def print_reduced_eq(eq):
 	print(" = 0")
 
 def compute_delta(a, b, c):
-	return b**2 - 4 * a * c
+	return b * b - 4 * a * c
 
 def get_coeffs(equation):
 	while len(equation) < 3:
@@ -70,9 +77,9 @@ def solve(a, b, delta):
 	if delta == 0:
 		return -b / 2 * a
 	elif delta > 0:
-		return [round((-b + math.sqrt(delta)) / 2 * a, 6), round((-b - math.sqrt(delta)) / 2 * a, 6)]
+		return [(-b + sqrt(delta)) / 2 * a, (-b - sqrt(delta)) / 2 * a]
 	else:
-		return [f"{-b} + i * {round(math.sqrt(abs(delta)), 6)} / {2 * a}", f"{-b} - i * {round(math.sqrt(abs(delta)), 6)} / {2 * a}"]
+		return [f"{-b} + i * {sqrt(absolute(delta))} / {2 * a}", f"{-b} - i * {sqrt(absolute(delta))} / {2 * a}"]
 
 def pretty_print_solution(delta, sol):
 	if delta == 0:
@@ -83,7 +90,7 @@ def pretty_print_solution(delta, sol):
 		print("Discriminant is stricly negative, ", end='')
 	print(f"solution{'s are' if len(sol) > 1 else ' is'}:")
 	for solution in sol:
-		print(solution)
+		print("{:.6f}".format(solution))
 
 
 if __name__ == "__main__":
@@ -92,6 +99,8 @@ if __name__ == "__main__":
 		reduced_form = []
 		for i in range(len(req)):
 			reduced_form.append(req[i] - leq[i])
+		if reduced_form == np.zeros(len(reduced_form)).tolist():
+			sys.exit("The solution is all real numbers.")
 		while reduced_form[-1] == 0:
 			reduced_form.pop(-1)
 		print_reduced_eq(reduced_form)
