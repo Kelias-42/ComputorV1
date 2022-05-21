@@ -4,11 +4,24 @@ import numpy as np
 def absolute(number):
 	return number if number > 0 else -number
 
+def round_float(number, decimal_count):
+	number = float(number)
+	string_number = str(number)
+	if "." in string_number:
+		integer_part, decimal_part = string_number.split(".")[0], string_number.split(".")[1]
+		if len(decimal_part) > decimal_count:
+			if int(decimal_part[decimal_count]) < decimal_count - 1:
+				decimal_part = decimal_part[0:decimal_count]
+			else:
+				decimal_part = str(int(decimal_part[0:decimal_count]) + 1)
+			number = float(integer_part + "." + decimal_part)
+	return number
+
 def sqrt(number):
 	estimate = number / 2
 	while absolute(estimate * estimate - number) > 0.00001:
 			estimate = (estimate + number / estimate) / 2
-	return round(estimate, 6)
+	return round_float(estimate, 6)
 
 def get_highest_power(str):
 	power = 0
@@ -93,8 +106,7 @@ def pretty_print_solution(delta, sol):
 		if delta < 0:
 			print(solution)
 		else:
-			print(round(solution, 6))
-
+			print(round_float(solution, 6))
 
 if __name__ == "__main__":
 	try:
@@ -118,7 +130,7 @@ if __name__ == "__main__":
 			solution = -c / b
 			if solution == -0:
 				solution = 0
-			print(f"The solution is\n{round(solution, 6)}")
+			print(f"The solution is\n{round_float(solution, 6)}")
 		else:
 			c, b, a = get_coeffs(reduced_form)
 			delta = compute_delta(a, b, c)
