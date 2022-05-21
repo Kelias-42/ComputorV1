@@ -5,10 +5,10 @@ def absolute(number):
 	return number if number > 0 else -number
 
 def sqrt(number):
-        estimate = number / 2
-        while absolute(estimate * estimate - number) > 0.00001:
-                estimate = (estimate + number / estimate) / 2
-        return estimate
+	estimate = number / 2
+	while absolute(estimate * estimate - number) > 0.00001:
+			estimate = (estimate + number / estimate) / 2
+	return round(estimate, 6)
 
 def get_highest_power(str):
 	power = 0
@@ -75,9 +75,9 @@ def get_coeffs(equation):
 
 def solve(a, b, delta):
 	if delta == 0:
-		return -b / 2 * a
+		return [-b / (2 * a)]
 	elif delta > 0:
-		return [(-b + sqrt(delta)) / 2 * a, (-b - sqrt(delta)) / 2 * a]
+		return [(-b + sqrt(delta)) / (2 * a), (-b - sqrt(delta)) / (2 * a)]
 	else:
 		return [f"{-b} + i * {sqrt(absolute(delta))} / {2 * a}", f"{-b} - i * {sqrt(absolute(delta))} / {2 * a}"]
 
@@ -90,7 +90,10 @@ def pretty_print_solution(delta, sol):
 		print("Discriminant is stricly negative, ", end='')
 	print(f"solution{'s are' if len(sol) > 1 else ' is'}:")
 	for solution in sol:
-		print("{:.6f}".format(solution))
+		if delta < 0:
+			print(solution)
+		else:
+			print(round(solution, 6))
 
 
 if __name__ == "__main__":
@@ -104,14 +107,23 @@ if __name__ == "__main__":
 		while reduced_form[-1] == 0:
 			reduced_form.pop(-1)
 		print_reduced_eq(reduced_form)
-		print("Polynomial degree:", len(reduced_form) - 1)
-		if len(reduced_form) - 1 > 2:
+		polynomial_degree = len(reduced_form) - 1
+		print("Polynomial degree:", polynomial_degree)
+		if polynomial_degree > 2:
 			print("The polynomial degree is strictly greater than 2, I can't solve.")
+		elif polynomial_degree == 0:
+			print("No solution")
+		elif polynomial_degree == 1:
+			c, b, a = get_coeffs(reduced_form)
+			solution = -c / b
+			if solution == -0:
+				solution = 0
+			print(f"The solution is\n{round(solution, 6)}")
 		else:
-			a, b, c = get_coeffs(reduced_form)
+			c, b, a = get_coeffs(reduced_form)
 			delta = compute_delta(a, b, c)
-			sol = solve(a, b, delta)
-		pretty_print_solution(delta, sol)
+			solution = solve(a, b, delta)
+			pretty_print_solution(delta, solution)
 	except Exception as ex:
 		print(ex)
 		print("Please enter your coefficients in the format : C * X^P")
