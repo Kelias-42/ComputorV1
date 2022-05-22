@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 def absolute(number):
-	return number if number > 0 else -number
+	return number if number >= 0 else -number
 
 def round_float(number, decimal_count):
 	number = float(number)
@@ -23,28 +23,28 @@ def sqrt(number):
 			estimate = (estimate + number / estimate) / 2
 	return round_float(estimate, 6)
 
-def get_highest_power(str):
+def get_highest_power(equation):
 	power = 0
-	str = str.split(' ')
-	for i in range(len(str)):
-		if len(str[i]) > 2 and str[i][0] == 'X' and str[i][1] == '^' and int(str[i][2:]) > power:
-			power = int(str[i][2:])
+	equation = equation.split(' ')
+	for i in range(len(equation)):
+		if len(equation[i]) > 2 and equation[i][0] == 'X' and equation[i][1] == '^' and int(equation[i][2:]) > power:
+			power = int(equation[i][2:])
 	return power
 
-def split_coefs(str, list_len ):
+def split_coefs(equation, list_len ):
 	eq = np.zeros(list_len)
-	str = str.split(' ')
+	equation = equation.split(' ')
 	sign, power, coef = [1, -1, -1]
-	for i in range(len(str)):
-		if (str[i][0]) == '-':
-			if len(str[i]) == 1:
+	for i in range(len(equation)):
+		if (equation[i][0]) == '-':
+			if len(equation[i]) == 1:
 				sign = -1
 			else:
-				coef = float(str[i])
-		elif (str[i][0] == 'X' and str[i][1] == '^'):
-			power = int(str[i][2:])
-		elif ((str[i][0] >= '0' and str[i][0] <= '9') or str[i][0] == '.'):
-			coef = float(str[i])
+				coef = float(equation[i])
+		elif (equation[i][0] == 'X' and equation[i][1] == '^'):
+			power = int(equation[i][2:])
+		elif ((equation[i][0] >= '0' and equation[i][0] <= '9') or equation[i][0] == '.'):
+			coef = float(equation[i])
 		if (power != -1 and coef != -1):
 			eq[power] = coef * sign
 			sign, power, coef = [1, -1, -1]
@@ -55,27 +55,20 @@ def parse():
 		sys.exit('Please provide a valid equation to solve')
 	left, right = (sys.argv[1]).split(" = ")
 	max_pwr = max(get_highest_power(left), get_highest_power(right))
-	leq = split_coefs(left, max_pwr + 1)
-	req = split_coefs(right, max_pwr + 1)
-	return leq, req
+	left_equation = split_coefs(left, max_pwr + 1)
+	right_equation = split_coefs(right, max_pwr + 1)
+	return left_equation, right_equation
 
-def is_at_end(eq, i):
-	while i != len(eq):
-		if eq[i] != 0:
-			return False	
-		i += 1
-	return True
-
-def print_reduced_eq(eq):
+def print_reduced_eq(equation):
 	print("Reduced form: ", end='')
-	for i in range(len(eq)):
-		coef = eq[i]
+	for i in range(len(equation)):
+		coef = equation[i]
 		if coef != 0:
 			coef = coef if i == 0 else absolute(coef)
 			coef = coef if coef - int(coef) > 0 else int(coef) 
 			print(coef, "*", "X^" + str(i), end='')
-			if i != len(eq) - 1:
-				print(" + " if eq[i + 1] > 0 else " - ", end='')
+			if i != len(equation) - 1:
+				print(" + " if equation[i + 1] > 0 else " - ", end='')
 	print(" = 0")
 
 def compute_delta(a, b, c):
